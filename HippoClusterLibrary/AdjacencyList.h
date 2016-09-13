@@ -54,10 +54,8 @@ namespace HippoClusterLibrary
 	public:
 		HIPPOCLUSTERLIBRARY_API AdjacencyList();
 
-		HIPPOCLUSTERLIBRARY_API void FromCSV(char* filename);
-		HIPPOCLUSTERLIBRARY_API void fromCSV(std::string filename);
-		HIPPOCLUSTERLIBRARY_API void toCSV(std::string filename);
-		HIPPOCLUSTERLIBRARY_API void AddEdge(char* vert1, char* vert2, double count, bool updateProbabilities = true);
+		HIPPOCLUSTERLIBRARY_API void fromTSV(std::string filename);
+		HIPPOCLUSTERLIBRARY_API void toTSV(std::string filename);
 		HIPPOCLUSTERLIBRARY_API void addEdge(std::string vert1, std::string vert2, double count, bool updateProbabilities = true);
 		HIPPOCLUSTERLIBRARY_API void calculateNeighborProbabilities();
 
@@ -67,7 +65,6 @@ namespace HippoClusterLibrary
 
 		HIPPOCLUSTERLIBRARY_API std::string getVertexName(int vertexNumber);
 
-		HIPPOCLUSTERLIBRARY_API bool VertexExists(char* vertexName);
 		HIPPOCLUSTERLIBRARY_API bool vertexExists(std::string vertexName);
 		HIPPOCLUSTERLIBRARY_API int getVertexNumber(std::string vertexName);
 

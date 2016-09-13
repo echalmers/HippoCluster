@@ -84,7 +84,7 @@ void HippoClusterUI::MainForm::loadFromCsv()
 	of.ShowDialog();
 
 	adjList = new AdjacencyList;
-	adjList->fromCSV(msclr::interop::marshal_as<std::string>(of.FileName));
+	adjList->fromTSV(msclr::interop::marshal_as<std::string>(of.FileName));
 
 	mainTextBox->AppendText(of.SafeFileName + Environment::NewLine);
 	mainTextBox->AppendText("Vertex Count: " + adjList->numVertices().ToString() + Environment::NewLine + "Edge Count: " + adjList->numEdges() + Environment::NewLine);

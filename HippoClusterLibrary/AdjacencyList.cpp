@@ -12,17 +12,20 @@
 
 namespace HippoClusterLibrary
 {
+	// A class representing an adjacency list representation of a graph
 	AdjacencyList::AdjacencyList()
 	{
 		srand(time(NULL));
 	}
 
-	void AdjacencyList::FromCSV(char* filename)
-	{
-		fromCSV(std::string(filename));
-	}
-
-	void AdjacencyList::fromCSV(std::string filename)
+	// ____fromTSV____
+	// load graph information from a tab-separated values file.
+	// each row in the file defines one directed edge, and is formatted as follows:
+	// vertexA \t vertexeB \t weight
+	// where vertexA and vertexB are the (string) names of the vertices that the edge goes from and to, respectively.
+	// weight is the numeric weight for the edge, and is optional.
+	// The AdjacencyList object will store the string vertex names, but will assign each vertex an integer ID for internal use.
+	void AdjacencyList::fromTSV(std::string filename)
 	{
 		adjList.clear();
 		vertexNames.clear();
@@ -72,7 +75,9 @@ namespace HippoClusterLibrary
 
 	}
 
-	void AdjacencyList::toCSV(std::string filename)
+	// ____toTSV____
+	// export the graph information to a tab-separated values file.
+	void AdjacencyList::toTSV(std::string filename)
 	{
 		std::ofstream file;
 		file.open(filename);
@@ -87,11 +92,13 @@ namespace HippoClusterLibrary
 		file.close();
 	}
 
-	void AdjacencyList::AddEdge(char* vert1, char* vert2, double count, bool updateProbabilities)
-	{
-		addEdge(std::string(vert1), std::string(vert2), count, updateProbabilities);
-	}
-
+	// ____addEdge____
+	// add a directed adge to the graph
+	// parameters:
+	// vert1 - string name of the vertex the edge departs from (the string name will be stored, but this vertex will be given an integer ID for internal use)
+	// vert2 - string name of the vertex the edge is incident to (the string name will be stored, but this vertex will be given an integer ID for internal use)
+	// count - weight for this edge
+	// updateProbabilities - whether to update probabilities associated with a transition out of vert1 after adding this edge info (default true)
 	void AdjacencyList::addEdge(std::string vert1, std::string vert2, double count, bool updateProbabilities)
 	{
 		// add first vertex to vertex list if necessary
@@ -133,6 +140,10 @@ namespace HippoClusterLibrary
 			calculateNeighborProbabilities(vertexNumbers[vert1]);
 	}
 
+	// ____calculateNeighborProbabilities(int startVertex)____
+	// calculate probabilities associated with transitions from a specified vertex to its neighbors
+	// parameters:
+	// startVertex - the integer ID for the vertex. This ID can be retrieved using the getVertexNumber method.
 	void AdjacencyList::calculateNeighborProbabilities(int startVertex)
 	{
 		double total = 0;
@@ -146,6 +157,10 @@ namespace HippoClusterLibrary
 		}
 	}
 
+	// ____calculateNeighborProbabilities()____
+	// calculate all probabilities associated with transitions between vertices, based on edge weights
+	// this should be done after adding edge info to the graph, before actually using the graph.
+	// it is not necessary if the graph was loaded using the fromTSV method
 	void AdjacencyList::calculateNeighborProbabilities()
 	{
 		for (int i = 0; i < adjList.size(); i++)
@@ -154,7 +169,12 @@ namespace HippoClusterLibrary
 		}
 	}
 	
-
+	// ____randNeighbor____
+	// probabilistically select a random neighbor of a specified vertex, based on the edge weights
+	// parameters:
+	//    vertex: the integer number of the source vertex. This number can be retrieved using the getVertexNumber method.
+	// returns:
+	//    the integer number of the selected neighbor.
 	int AdjacencyList::randNeighbor(int vertex)
 	{
 		double p = (double)rand() / RAND_MAX;
@@ -167,10 +187,17 @@ namespace HippoClusterLibrary
 				return std::get<0>(adjList[vertex][i]);
 			}
 		}
+
 		//std::cout << "error" << std::endl;
 		return -1;
 	}
 
+	// ____allNeighbors____
+	// parameters:
+	//    vertex: the integer number of the source vertex. This number can be retrieved using the getVertexNumber method.
+	// returns:
+	//     a vector of pairs<int, double>. The first element of each pair is the integer index of one neighbor of vertex.
+	//     the second element is the probability associated with a transition to that neighbor.
 	std::vector<std::pair<int, double>> AdjacencyList::allNeighbors(int vertex)
 	{
 		std::vector<std::pair<int, double>> neighbors;  
@@ -182,8 +209,14 @@ namespace HippoClusterLibrary
 		return neighbors;
 	}
 
-
-
+	// ____randPath____
+	// generate a random path through the graph, starting at a specified vertex
+	// parameters:
+	//    startVertex - the integer index of the start vertex. This number can be retrieved using the getVertexNumber method.
+	//    length - the length of the path
+	//    path - reference to a vector<int> where the integer IDs of vertices along the path will be stored.
+	//    pathVector - reference to a vector<double> with the same length as the number of vertices in the graph.
+	//                 elements of this vector corresponding to the integer indices in 'path' will be set to 1.
 	void AdjacencyList::randPath(int startVertex, int length, std::vector<int>& path, std::vector<double>& pathVector)
 	{
 		pathVector.resize(adjList.size(), 0);
@@ -207,31 +240,36 @@ namespace HippoClusterLibrary
 		}
 	}
 
+	// ____getVertexName____
+	// given the integer ID of a vertex, returns that vertex's string name
 	std::string AdjacencyList::getVertexName(int vertexNumber)
 	{
 		return vertexNames[vertexNumber];
 	}
 
-	bool AdjacencyList::VertexExists(char* vertexName)
-	{
-		return vertexExists(std::string(vertexName));
-	}
-
+	// ____vertexExists____
+	// checks to see if a vertex with a given string name exists in the graph
 	bool AdjacencyList::vertexExists(std::string vertexName)
 	{
 		return vertexNumbers.count(vertexName) > 0;
 	}
 
+	// ____getVertexNumber____
+	// given the string name of a vertex, returns that vertex's integer ID
 	int AdjacencyList::getVertexNumber(std::string vertexName)
 	{
 		return vertexNumbers[vertexName];
 	}
 
+	// ____numVertices____
+	// returns the number of vertices in the graph
 	int AdjacencyList::numVertices()
 	{
 		return adjList.size();
 	}
 
+	// ____numEdges____
+	// returns the number of edges in the graph
 	int AdjacencyList::numEdges()
 	{
 		int e = 0;
@@ -242,6 +280,8 @@ namespace HippoClusterLibrary
 		return e;
 	}
 
+	// ____countAbsorbingVertices____
+	// returns the number of absorbing vertices in the graph (vertices with no outgoing edges)
 	int AdjacencyList::countAbsorbingVertices()
 	{
 		std::ofstream file;
@@ -262,6 +302,7 @@ namespace HippoClusterLibrary
 		return numAbsorb;
 	}
 
+	// depreciated
 	void AdjacencyList::countSubgraphs(std::unordered_map<int, int>& subgraphSizes, std::vector<int>& subgraphAssignments)
 	{
 		int currentSubgraphNumber = 0;
@@ -340,29 +381,13 @@ namespace HippoClusterLibrary
 
 	}
 
-	void AdjacencyList::removeSubgraphs(std::unordered_map<int, int>& subgraphSizes, std::vector<int>& subgraphAssignments, int minSize)
-	{
-		std::ofstream file;
-		file.open("reducedGraph.tsv");
-
-		for (int i = 0; i < adjList.size(); i++)
-		{
-			int thisAssignment = subgraphAssignments[i];
-			if (subgraphSizes[thisAssignment] < minSize)
-				continue;
-
-			for (int n = 0; n < adjList[i].size(); n++)
-			{
-				std::string v1 = vertexNames[i];
-				std::string v2 = vertexNames[std::get<0>(adjList[i][n])];
-				file << v1 << "\t" << v2 << "\t" << std::get<1>(adjList[i][n]) << std::endl;
-			}
-		}
-
-		file.close();
-		fromCSV("reducedGraph.tsv");
-	}
-
+	
+	// ____findSCCs____
+	// runs Tarjan's algorithm to identify all strongly-connected components in the graph
+	// parameters:
+	//    SCCs - reference to a vector of vectors that contain integer IDs of vertices in one strongly connected component
+	// returns:
+	//    the index in SCCs corresponding to the largest SCC
 	int AdjacencyList::findSCCs(std::vector<std::vector<int>*>& SCCs)
 	{
 		std::stack<int> S;
@@ -400,6 +425,8 @@ namespace HippoClusterLibrary
 
 	}
 
+	// ____strongConnect____
+	// private function for use in finding strongly connected components
 	void AdjacencyList::strongConnect(int v, long& index, std::stack<int>& S, std::vector<int>& indices, std::vector<int>& lowLinks, std::vector<bool>& onStack, std::vector<std::vector<int>*>& SCCs)
 	{
 		// Set the depth index for v to the smallest unused index
@@ -439,11 +466,38 @@ namespace HippoClusterLibrary
 				SCCs[SCCs.size() - 1]->push_back(w);
 			} while (w != v);
 		}
-
-
 	}
 
+	// depreciated
+	void AdjacencyList::removeSubgraphs(std::unordered_map<int, int>& subgraphSizes, std::vector<int>& subgraphAssignments, int minSize)
+	{
+		std::ofstream file;
+		file.open("reducedGraph.tsv");
 
+		for (int i = 0; i < adjList.size(); i++)
+		{
+			int thisAssignment = subgraphAssignments[i];
+			if (subgraphSizes[thisAssignment] < minSize)
+				continue;
+
+			for (int n = 0; n < adjList[i].size(); n++)
+			{
+				std::string v1 = vertexNames[i];
+				std::string v2 = vertexNames[std::get<0>(adjList[i][n])];
+				file << v1 << "\t" << v2 << "\t" << std::get<1>(adjList[i][n]) << std::endl;
+			}
+		}
+
+		file.close();
+		fromTSV("reducedGraph.tsv");
+	}
+
+	// ____subgraph____
+	// reduces the adjacency list to a specified subgraph
+	// parameters: 
+	//    verticesToKeep - pointer to a vector of integer vertex IDs to keep
+	// returns:
+	//    a new AdjacencyList object representing the subgraph
 	AdjacencyList AdjacencyList::subgraph(std::vector<int>* verticesToKeep)
 	{
 		AdjacencyList newList;
@@ -469,7 +523,11 @@ namespace HippoClusterLibrary
 		return newList;
 	}
 
-	HIPPOCLUSTERLIBRARY_API void AdjacencyList::toSparseMatrix(std::unordered_map<int, std::unordered_map<int, double>>& mat)
+	// ____toSparseMatrix____
+	// convert the adjacency list to a sparse adjacency matrix
+	// parameters:
+	//    mat - reference to an unordered map of unordered maps that will store the sparse matrix
+	void AdjacencyList::toSparseMatrix(std::unordered_map<int, std::unordered_map<int, double>>& mat)
 	{
 		mat.clear();
 
@@ -483,6 +541,11 @@ namespace HippoClusterLibrary
 		}
 	}
 
+	// ____getClusterStats____
+	// parameters:
+	//    clusterAssignments - reference to a vector<int>, in which the ith element indicates the cluster assignment for the vertex with integer ID i.
+	// returns:
+	//    a ClusterStats object containing some stats for the specified clustering
 	ClusterStats AdjacencyList::getClusterStats(std::vector<int>& clusterAssignments)
 	{
 		CRITICAL_SECTION criticalSection;
