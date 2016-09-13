@@ -60,7 +60,8 @@ namespace HippoClusterLibrary
 		HIPPOCLUSTERLIBRARY_API void calculateNeighborProbabilities();
 
 		HIPPOCLUSTERLIBRARY_API int randNeighbor(int vertex);
-		HIPPOCLUSTERLIBRARY_API std::vector<std::pair<int, double>> allNeighbors(int vertex);
+		HIPPOCLUSTERLIBRARY_API std::vector<std::tuple<int, double, double>> allNeighbors(int vertex);
+		HIPPOCLUSTERLIBRARY_API std::vector<std::tuple<int, double, double>> isNeighborOf(int vertex);
 		HIPPOCLUSTERLIBRARY_API void randPath(int startVertex, int length, std::vector<int>& path, std::vector<double>& pathVector);
 
 		HIPPOCLUSTERLIBRARY_API std::string getVertexName(int vertexNumber);
@@ -70,6 +71,7 @@ namespace HippoClusterLibrary
 
 		HIPPOCLUSTERLIBRARY_API int numVertices();
 		HIPPOCLUSTERLIBRARY_API int numEdges();
+		HIPPOCLUSTERLIBRARY_API double sumWeights();
 		HIPPOCLUSTERLIBRARY_API int countAbsorbingVertices();
 		HIPPOCLUSTERLIBRARY_API void countSubgraphs(std::unordered_map<int, int>& subgraphSizes, std::vector<int>& subgraphAssignments);
 		HIPPOCLUSTERLIBRARY_API void removeSubgraphs(std::unordered_map<int, int>& subgraphSizes, std::vector<int>& subgraphAssignments, int minSize);

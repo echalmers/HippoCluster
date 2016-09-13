@@ -193,21 +193,53 @@ namespace HippoClusterLibrary
 	}
 
 	// ____allNeighbors____
+	// returns all neighbors of a specified vertex (all vertices which can be reached from the vertex via a directed edge)
 	// parameters:
 	//    vertex: the integer number of the source vertex. This number can be retrieved using the getVertexNumber method.
 	// returns:
-	//     a vector of pairs<int, double>. The first element of each pair is the integer index of one neighbor of vertex.
-	//     the second element is the probability associated with a transition to that neighbor.
-	std::vector<std::pair<int, double>> AdjacencyList::allNeighbors(int vertex)
+	//     a vector of tuple<int, double, double>. The first element of each pair is the integer index of one neighbor of vertex.
+	//     the second element is the edge weight between the two vertices
+	//     the third element is the probability associated with a transition to that neighbor, given the weights.
+	std::vector<std::tuple<int, double, double>> AdjacencyList::allNeighbors(int vertex)
 	{
-		std::vector<std::pair<int, double>> neighbors;  
+		std::vector<std::tuple<int, double, double>> neighbors;  
 		for (int i = 0; i < adjList[vertex].size(); i++)
 		{
-			std::pair<int, double> thisNeighbor(std::get<0>(adjList[vertex][i]), std::get<2>(adjList[vertex][i]));
-			neighbors.push_back(thisNeighbor);
+			//std::pair<int, double> thisNeighbor(std::get<0>(adjList[vertex][i]), std::get<2>(adjList[vertex][i]));
+			neighbors.push_back(adjList[vertex][i]);// thisNeighbor);
 		}
 		return neighbors;
 	}
+
+	// ____isNeighborOf____
+	// returns all vertices that a specified vertex is a neighbor of (all vertices which can reach the specified vertex via a directed edge)
+	// parameters:
+	//    vertex: the integer number of the destination vertex. This number can be retrieved using the getVertexNumber method.
+	// returns:
+	//     a vector of tuple<int, double, double>. The first element of each pair is the integer ID of one vertex for which the specified vertex is a neighbor.
+	//     the second element is the edge weight between the two vertices
+	//     the third element is the probability associated with a transition to the specified neighbor, given edge weights.
+	std::vector<std::tuple<int, double, double>> AdjacencyList::isNeighborOf(int vertex)
+	{
+		std::vector<std::tuple<int, double, double>> vertices;
+
+		for (int v = 0; v < adjList.size(); v++)
+		{
+			for (int n = 0; n < adjList[v].size(); n++)
+			{
+				int sourceID = v;
+				int destinationID = std::get<0>(adjList[v][n]);
+				if (destinationID == vertex)
+				{
+					double weight = std::get<1>(adjList[v][n]);
+					double prob = std::get<2>(adjList[v][n]);
+					vertices.push_back(std::tuple<int, double, double>(sourceID, weight, prob));
+				}
+			}
+		}
+		return vertices;
+	}
+
 
 	// ____randPath____
 	// generate a random path through the graph, starting at a specified vertex
@@ -278,6 +310,21 @@ namespace HippoClusterLibrary
 			e += adjList[i].size();
 		}
 		return e;
+	}
+
+	// ___sumWeights____
+	// returns the sum of all edge weights in the graph
+	double AdjacencyList::sumWeights()
+	{
+		double sum = 0;
+		for (int v = 0; v < adjList.size(); v++)
+		{
+			for (int n = 0; n < adjList[v].size(); n++)
+			{
+				sum += std::get<1>(adjList[v][n]);
+			}
+		}
+		return sum;
 	}
 
 	// ____countAbsorbingVertices____
@@ -578,7 +625,7 @@ namespace HippoClusterLibrary
 			int thisRenumberedAssignment = renumberedAssignments[clusterAssignments[v]];
 			clusterCnts[thisRenumberedAssignment]++;
 
-			std::vector<std::pair<int, double>> neighbors = allNeighbors(v);
+			std::vector<std::tuple<int, double, double>> neighbors = allNeighbors(v);
 			for (int n = 0; n < neighbors.size(); n++)
 			{
 				EnterCriticalSection(&criticalSection);

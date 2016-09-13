@@ -26,12 +26,13 @@ int main()
 	cout << "vertex name	id" << endl;
 	for (int i = 0; i < adjacencyList.numVertices(); i++)
 	{
-		cout << adjacencyList.getVertexName(i) << "\t" << i << endl;
+		cout << adjacencyList.getVertexName(i) << "\t\t" << i << endl;
 	}
 
 	// show some info about the graph
-	cout << "number of vertices: " << adjacencyList.numVertices() << endl;
-	cout << "number of edges:    " << adjacencyList.numEdges() << endl;
+	cout << "number of vertices:  " << adjacencyList.numVertices() << endl;
+	cout << "number of edges:     " << adjacencyList.numEdges() << endl;
+	cout << "sum of edge weights: " << adjacencyList.sumWeights() << endl << endl;
 
 	// find strongly connected components
 	vector<vector<int>*> sccs;
@@ -41,15 +42,15 @@ int main()
 	cout << "reducing to biggest SCC" << endl;
 	AdjacencyList mainSCC = adjacencyList.subgraph(sccs[maxIndex]);
 
-	// list all vertex names and assigned id numbers
+	// list all vertex names and assigned id numbers in the main SCC
 	cout << "vertex name	id" << endl;
 	for (int i = 0; i < mainSCC.numVertices(); i++)
 	{
-		cout << mainSCC.getVertexName(i) << "\t" << i << endl;
+		cout << mainSCC.getVertexName(i) << "\t\t" << i << endl;
 	}
 
 	// run a clustering algorithm on the full graph
-	cout << "running the new clustering algorith for 1000 iterations" << endl;
+	cout << endl << "running the new clustering algorith for 1000 iterations" << endl;
 	HippoCluster hc(&adjacencyList);
 	hc.setNumNodes(10);
 	hc.setTrajectoryLength(adjacencyList.numVertices());
@@ -63,7 +64,7 @@ int main()
 	hc.getAllClusterAssignments(assignments);
 	for (int i = 0; i < assignments.size(); i++)
 	{
-		cout << adjacencyList.getVertexName(i) << "\t" << assignments[i] << endl;
+		cout << adjacencyList.getVertexName(i) << "\t\t" << assignments[i] << endl;
 	}
 
 	// display some stats for the clustering
@@ -71,7 +72,7 @@ int main()
 	cout << "mean cluster size: " << stats.getClusterSizeMean() << " +/- " << stats.getClusterSizeSD() << endl;
 	cout << "weighted average relative density: " << stats.getWeightedAvgRelativeDensity() << endl;
 
-
+	
 	getchar();
     return 0;
 }

@@ -39,13 +39,13 @@ namespace HippoClusterLibrary
 
 
 			// get most popular class assignment among this vertex's neighbors
-			vector<pair<int, double>> neighbors = adjList->allNeighbors(v);
+			vector<tuple<int, double, double>> neighbors = adjList->allNeighbors(v);
 			unordered_map<int, double> counts;
 			for (int i = 0; i < neighbors.size(); i++)
 			{
 				int thisNeighbor = std::get<0>(neighbors[i]);
 				int neighborsCluster = clusterAssignments[thisNeighbor];
-				double neighborsWeight = std::get<1>(neighbors[i]);
+				double neighborsWeight = std::get<2>(neighbors[i]);
 				if (counts.emplace(neighborsCluster, neighborsWeight).second == false)
 				{
 					counts[neighborsCluster] += neighborsWeight;
