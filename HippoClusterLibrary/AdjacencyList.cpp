@@ -95,10 +95,10 @@ namespace HippoClusterLibrary
 	// ____addEdge____
 	// add a directed adge to the graph
 	// parameters:
-	// vert1 - string name of the vertex the edge departs from (the string name will be stored, but this vertex will be given an integer ID for internal use)
-	// vert2 - string name of the vertex the edge is incident to (the string name will be stored, but this vertex will be given an integer ID for internal use)
-	// count - weight for this edge
-	// updateProbabilities - whether to update probabilities associated with a transition out of vert1 after adding this edge info (default true)
+	//     vert1 - string name of the vertex the edge departs from (the string name will be stored, but this vertex will be given an integer ID for internal use)
+	//     vert2 - string name of the vertex the edge is incident to (the string name will be stored, but this vertex will be given an integer ID for internal use)
+	//     count - weight for this edge
+	//     updateProbabilities - whether to update probabilities associated with a transition out of vert1 after adding this edge info (default true)
 	void AdjacencyList::addEdge(std::string vert1, std::string vert2, double count, bool updateProbabilities)
 	{
 		// add first vertex to vertex list if necessary
@@ -143,7 +143,7 @@ namespace HippoClusterLibrary
 	// ____calculateNeighborProbabilities(int startVertex)____
 	// calculate probabilities associated with transitions from a specified vertex to its neighbors
 	// parameters:
-	// startVertex - the integer ID for the vertex. This ID can be retrieved using the getVertexNumber method.
+	//     startVertex - the integer ID for the vertex. This ID can be retrieved using the getVertexNumber method.
 	void AdjacencyList::calculateNeighborProbabilities(int startVertex)
 	{
 		double total = 0;
@@ -696,26 +696,33 @@ namespace HippoClusterLibrary
 	{
 	}
 
+	// average relative density across all clusters. Relative density of a cluster is defined as
+	//		degInt / (degInt + degExt)
+	// where degInt and degExt are internal and external degrees for the cluster, respectively
 	HIPPOCLUSTERLIBRARY_API double ClusterStats::getAvgRelativeDensity()
 	{
 		return avgRelativeDensity;
 	}
 
+	// Weighted avergae relative density accross all clusters, where each cluster is weighted by its size
 	HIPPOCLUSTERLIBRARY_API double ClusterStats::getWeightedAvgRelativeDensity()
 	{
 		return weightedAvgRelativeDensity;
 	}
 
+	// mean cluster size
 	HIPPOCLUSTERLIBRARY_API double ClusterStats::getClusterSizeMean()
 	{
 		return clusterSizeMean;
 	}
 
+	// standard deviation of cluster size
 	HIPPOCLUSTERLIBRARY_API double ClusterStats::getClusterSizeSD()
 	{
 		return clusterSizeSD;
 	}
 
+	// maximum cluster size
 	HIPPOCLUSTERLIBRARY_API double ClusterStats::getClusterSizeMax()
 	{
 		return clusterSizeMax;

@@ -10,6 +10,10 @@
 
 namespace HippoClusterLibrary
 {
+	// ____HippoCluster (constructor)____
+	// Constructs an object representing the hippocluster algorithm
+	// parameters:
+	// Adjlist - the AdjacencyList object representing the graph to be clustered
 	HippoCluster::HippoCluster(AdjacencyList* AdjList)
 	{
 		adjList = AdjList;
@@ -17,12 +21,19 @@ namespace HippoClusterLibrary
 		initialize();
 	}
 
+
+	// ____setNumNodes____
+	// Sets the number of nodes in the self organizing map (i.e. the maximum number of clusters)
+	// parameters:
+	//    number - the number of nodes
 	void HippoCluster::setNumNodes(int number)
 	{
 		numNodes = number;
 		initialize();
 	}
 
+	// ____initialize____
+	// initializes the self organizing map with random weights
 	void HippoCluster::initialize()
 	{
 		// initialize with random weights
@@ -40,6 +51,11 @@ namespace HippoClusterLibrary
 		);
 	}
 
+	// ____exportClusterAssignments____
+	// exports a list of cluster assignments to a tab-separated-value file. The ith value in the list 
+	// is the cluster to which the ith vertex in the graph has been assigned
+	// parameters:
+	//    fileName: the file to write to.
 	void HippoCluster::exportClusterAssignments(std::string fileName)
 	{
 		std::ofstream file;
@@ -53,7 +69,8 @@ namespace HippoClusterLibrary
 		file.close();
 	}
 
-
+	// ____getRepresentativeVertex____
+	// depreciated
 	int HippoCluster::getRepresentativeVertex(int clusterNumber)
 	{
 		int vertexNumber = 0;
@@ -70,7 +87,8 @@ namespace HippoClusterLibrary
 
 	}
 
-
+	// ____step____
+	// performs one iteration of the algorithm, including generating a random trajectory and updating the self organizing map.
 	void HippoCluster::step()
 	{
 		// generate a random trajectory
@@ -112,6 +130,14 @@ namespace HippoClusterLibrary
 		delete d;
 	}
 
+
+	// ____updateWeights____
+	// performs the weight update for the self organizing map. Called by the 'step' method.
+	// parameters:
+	//    node: the integer index of the SOM node to update
+	//    minIndex: the index of the winning SOM node
+	//    traj: randomly generated trajectory (path) through the graph - returned by AdjacencyList.randPath
+	//    trajVector: vector form of the randomly generated trajectory - returned by AdjacencyList.randPath
 	void HippoCluster::updateWeights(int node, int minIndex, std::vector<int>& traj, std::vector<double>& trajVector)
 	{
 		// for the winning node, update all weights
@@ -133,6 +159,8 @@ namespace HippoClusterLibrary
 	}
 
 
+	// ____dropUnusedNodes____
+	// removes any self-organizing-map nodes which have no vertices assigned to them.
 	int HippoCluster::dropUnusedNodes()
 	{
 		CRITICAL_SECTION criticalSection;
@@ -173,11 +201,22 @@ namespace HippoClusterLibrary
 		return dropped;
 	}
 
+
+	// ____setTrajectoryLength____
+	// sets the length of the random trajectories (paths) used to drive the self-organizing map
+	// parameters:
+	//    length: the length.
 	void HippoCluster::setTrajectoryLength(int length)
 	{
 		trajectoryLength = length;
 	}
 
+
+	// ____cosineDist____
+	// calculates cosine distance between a given trajectory, and each self-organizing-map node
+	// parameters:
+	//    trajectory: a randomly generated trajectory (path) through the graph - returned by AdjacencyList.randPath
+	//    output: pointer to a double array which will store the distances between trajectory and each SOM node
 	void HippoCluster::cosineDist(std::vector<int>& trajectory, double *output)
 	{
 		double trajMag = sqrt(trajectory.size());
@@ -206,6 +245,11 @@ namespace HippoClusterLibrary
 		);
 	}
 
+	// ____manhatDist____
+	// calculates manhattan distance between a given trajectory, and each self-organizing-map node
+	// parameters:
+	//    trajectory: a randomly generated trajectory (path) through the graph - returned by AdjacencyList.randPath
+	//    output: pointer to a double array which will store the distances between trajectory and each SOM node
 	void HippoCluster::manhatDist(std::vector<double>& trajVector, double* output)
 	{
 		
@@ -222,6 +266,13 @@ namespace HippoClusterLibrary
 		);
 	}
 
+
+	// ____getCluster____
+	// calculates the self-organizing-map node to which a given vertex is currently assigned
+	// parameters:
+	//    vertexNumber: the integer index of the vertex
+	// returns:
+	//    the integer index of the node to which the vertex is assigned
 	int HippoCluster::getCluster(int vertexNumber)
 	{
 		/* should we be getting the max weight, or dividing by magnitude as in cosine dist? ***/
@@ -237,17 +288,24 @@ namespace HippoClusterLibrary
 		return clusterNum;
 	}
 
-	int HippoCluster::GetCluster(char* vertexName)
-	{
-		return getCluster(std::string(vertexName));
-	}
-
+	
+	// ____getCluster____
+	// calculates the self-organizing-map node to which a given vertex is currently assigned
+	// parameters:
+	//    vertexName: the string name of the vertex
+	// returns:
+	//    the integer index of the node to which the vertex is assigned
 	int HippoCluster::getCluster(std::string vertexName)
 	{
 		int vertexNumber = adjList->getVertexNumber(vertexName);
 		return getCluster(vertexNumber);
 	}
 
+
+	// ____entropy____
+	// calculates the average binary entropy in the self-organizing-map node weights.
+	// returns:
+	//    average entropy
 	double HippoCluster::entropy()
 	{
 		std::vector<double> h(numNodes, 0);
@@ -271,6 +329,10 @@ namespace HippoClusterLibrary
 		return H / numNodes / numVertices;
 	}
 
+	// ____getAllClusterAssignments____
+	// calculates the self-organizing-map node to which each vertex in the adjacency list is currently assigned
+	// parameters:
+	//    assignments: reference to a vector which will store the cluster assignments
 	void HippoCluster::getAllClusterAssignments(std::vector<int>& assignments)
 	{
 		// compute all cluster assignments
